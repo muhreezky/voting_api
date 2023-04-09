@@ -1,2 +1,2 @@
-start cd .\backend && npm install
-start cd .\frontend
+start .\backend\install.bat
+start .\frontend\install.bat
