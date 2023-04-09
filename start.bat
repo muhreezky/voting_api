@@ -1,4 +1,4 @@
 @echo off
 
-start .\frontend\start.bat
-start .\backend\start.bat
+cd .\frontend && start .\start.bat
+cd ..\backend && start .\start.bat
