@@ -1,4 +1,4 @@
 @echo off
 
-cd .\voting_api
+cd .\backend
 pnpm start || npm start
