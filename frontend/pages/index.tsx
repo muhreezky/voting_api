@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { useEffect, useState } from 'react';
 import useLocalStorage from '../components/hooks/useLocalStorage'
+import Swal from 'sweetalert2'
 // import img from "../styles/foto.jpg"
 // import Image from 'foto.jpg';
 
@@ -31,6 +32,51 @@ const Home: NextPage = () => {
       });
     console.log(authToken);
   }, []);
+
+  const showLink = (join_code: string) => {
+    Swal.fire({
+      title: "Link Share",
+      text: `${document.location.origin}/participant/${join_code}`,
+      icon: 'info'
+    })
+  };
+
+  const deleteVoting = (vote_id: number) => {
+    Swal.fire({
+      title: "Confirm",
+      text: "Do you want to delete this vote?",
+      showCancelButton: true,
+      icon: 'question'
+    })
+      .then (res => {
+        if (res.isConfirmed) {
+          axios.delete(`http://localhost:8000/votings/${vote_id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.loginToken}`
+            }
+          })
+            .then (res => {
+              Swal.fire({
+                title: "<b>Success</b>",
+                text: "Voting Deleted",
+                icon: 'success'
+              })
+                .then (res => {
+                  if (res) {
+                    router.reload();
+                  }
+                })
+            })
+            .catch (err => {
+              Swal.fire({
+                title: "<b>Error</b>",
+                text: err.response.data.message,
+                icon: 'error'
+              })
+            })
+        }
+      })
+  }
 
   return (
     <>
@@ -95,10 +141,10 @@ const Home: NextPage = () => {
                         <td className='p-5 text-left'>
                           <div>
                             <a href='#' className="mb-5">
-                              <LinkIcon className='w-6 h-6 hover:bg-zink-100 mb-5' />
+                              <LinkIcon onClick={() => showLink(value.join_code)} className='w-6 h-6 hover:bg-zink-100 mb-5' />
                             </a>
                             <a href='#'>
-                              <TrashIcon className='w-6 h-6 hover:bg-zink-100' />
+                              <TrashIcon onClick={() => deleteVoting(value.voting_id)} className='w-6 h-6 hover:bg-zink-100' />
                             </a>
                           </div>
                         </td>

@@ -8,6 +8,8 @@ import { useFormik } from "formik";
 import axios from "axios";
 import useLocalStorage from "../../components/hooks/useLocalStorage";
 import { useRouter } from "next/router";
+import { loginSchema } from "../../components/schema";
+import { useEffect } from "react";
 
 export default function Login(){
     const [auth, setAuth] = useLocalStorage("loginToken");
@@ -18,6 +20,7 @@ export default function Login(){
             email: "",
             password: ""
         },
+        validationSchema: loginSchema,
         onSubmit: ({ email, password }) => {
             axios.post("http://localhost:8000/auth/login", {
                 email,
@@ -31,6 +34,10 @@ export default function Login(){
                 .catch(err => console.error(err));
         }
     });
+
+    useEffect(() => {
+        auth && router.push("/");
+    }, [auth])
     return (
         <>
             <Menu />

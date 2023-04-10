@@ -38,8 +38,10 @@ export default function CandidateForm(props: Props) {
             <Input
                 placeholder="Masukan Nama Kandidat"
                 value={candidate.name}
+                name="candidate"
                 onChange={(e) => {
-                    setCandidate({ ...candidate, name: e })
+                    setCandidate({ ...candidate, name: e });
+                    // props.submitCandidate(candidate);
                 }} />
         </div>
     );

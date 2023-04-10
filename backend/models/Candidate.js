@@ -15,10 +15,6 @@ const Candidate = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
     votes: {
       type: DataTypes.INTEGER,
       defaultValue: 0

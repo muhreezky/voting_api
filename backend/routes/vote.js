@@ -13,11 +13,12 @@ routes.post("/vote", verifyToken, voteController.voteFor);
 routes.post("/:id/finish", verifyToken, checkPrivilege, voteController.finish);
 
 // GET routes
-routes.get("/:id", verifyToken, voteController.getVoteById);
-routes.get("/:id/candidates", verifyToken, voteController.candidateList);
 routes.get("/", verifyToken, voteController.dataList);
-routes.get("/:id/winner", verifyToken, voteController.getWinner);
+routes.get("/:code", verifyToken, voteController.getVoteByCode);
+routes.get("/:id/candidates", verifyToken, voteController.candidateList);
+// routes.get("/:id/winner", verifyToken, voteController.getWinner);
 
 // DELETE routes
+routes.delete("/:id", verifyToken, checkPrivilege, voteController.deleteVote);
 
 module.exports = routes;

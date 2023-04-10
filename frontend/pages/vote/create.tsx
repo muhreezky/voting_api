@@ -14,17 +14,44 @@ import { useFormik } from "formik";
 import { useRouter } from 'next/router';
 import RestrictedPage from '../../components/page/RestrictedPage';
 import useLocalStorage from '../../components/hooks/useLocalStorage';
-
+import axios from "axios";
 
 export default function CreateVote() {
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [authToken, setAuthToken] = useLocalStorage("loginToken");
   const router = useRouter();
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      candidate: "",
+      start_date: "",
+      end_date: ""
+    },
+    onSubmit: ({ name, candidate, start_date, end_date }) => {
+      axios.post("http://localhost:8000/votings", {
+        name,
+        candidate,
+        start_date: start_date.replace(".000Z", ".782Z"),
+        end_date: end_date.replace(".000Z", ".782Z")
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.loginToken}`
+        }
+      })
+        .then(res => router.push("/"))
+        .catch(err => console.error(err))
+    }
+  })
 
   useEffect(() => {
     setAuthToken(localStorage.getItem("loginToken"));
   }, []);
+
+  useEffect(() => {
+    formik.setFieldValue("start_date", startDate.toJSON());
+    formik.setFieldValue("end_date", endDate.toJSON());
+  }, [startDate, endDate]);
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
 
@@ -39,7 +66,7 @@ export default function CreateVote() {
     const newCandidate: Candidate = {
       name: "",
       key: candidates.length + 1,
-      title: "",
+      title: ""
     };
     setCandidates([...candidates, newCandidate]);
   };
@@ -58,6 +85,9 @@ export default function CreateVote() {
     setCandidates(newCandidates);
   };
 
+  useEffect(() => {
+    formik.setFieldValue("candidate", candidates);
+  }, [candidates]);
 
   return (
     <div className="container mx-auto">
@@ -75,7 +105,7 @@ export default function CreateVote() {
                 Silahkan masukan data yang dibutuhkan sebelum membuat vote online
               </h2>
 
-              <form className='flex flex-col'>
+              <form className='flex flex-col' onSubmit={formik.handleSubmit} onChange={formik.handleChange}>
                 {/* <DetailVote> */}
                 <div className='space-y-5'>
                   <h3 className='font-medium text-xl mt-10'>Detail Voting</h3>
@@ -86,6 +116,8 @@ export default function CreateVote() {
                       onChange={() => { }}
                       placeholder={"Contoh : Voting Calon Gubernur"}
                       className={"mt-01 w-1/2"}
+                      name="name"
+                      id="name"
                     />
                   </div>
 
@@ -96,6 +128,8 @@ export default function CreateVote() {
                         locale={"id"}
                         showTimeSelect
                         selected={startDate}
+                        name="start_date"
+                        id="start_date"
                         onChange={(date) => date && setStartDate(date)}
                         dateFormat={"Pp"}
                         minDate={new Date()}
@@ -107,6 +141,8 @@ export default function CreateVote() {
                         locale={"id"}
                         showTimeSelect
                         selected={endDate}
+                        name="start_date"
+                        id="start_date"
                         onChange={(date) => date && setEndDate(date)}
                         dateFormat={"Pp"}
                         minDate={startDate}
@@ -140,7 +176,7 @@ export default function CreateVote() {
                 {/* </Kandidat> */}
 
 
-                <Button style="primary" className="w-100" text="Buat Voting" />
+                <Button type="submit" style="primary" className="w-100" text="Buat Voting" />
                 {/* {JSON.stringify(candidates)} */}
               </form>
             </div>

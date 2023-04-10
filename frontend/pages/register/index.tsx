@@ -6,10 +6,13 @@ import { useFormik } from "formik";
 import useLocalStorage from "../../components/hooks/useLocalStorage";
 import axios from "axios";
 import { useRouter } from "next/router";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 export default function Register() {
   const [loginToken, setLoginToken] = useLocalStorage("loginToken");
   const router = useRouter();
+  const MySwal = withReactContent(Swal);
 
   const formik = useFormik({
     initialValues: {
@@ -29,7 +32,10 @@ export default function Register() {
           .then(res => router.push("/login"))
           .catch(err => console.log(err));
       } else {
-        alert("Confirm your pass first");
+        MySwal.fire({
+          title: <b>Confirm</b>,
+          html: <h3>Confirm your password first</h3>
+        })
       }
     }
   });

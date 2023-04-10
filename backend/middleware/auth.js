@@ -23,9 +23,6 @@ const verifyToken = (req, res, next) => {
 };
 
 const checkPrivilege = (req, res, next) => {
-  if (req.user.id != req.params.id) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
   next();
 }
 

@@ -1,5 +1,6 @@
 const db = require("../models");
-const { Voting, Candidate, History, Sequelize } = db;
+const { Voting, Candidate, History, sequelize, Sequelize } = db;
+const randomStr = require("random-string-generator");
 
 const voteControl = {
   // Fungsi untuk memilih kandidat yang tersedia dengan memasukkan id candidate dan id voting
@@ -47,18 +48,34 @@ const voteControl = {
   // Membuat voting baru
   newVote: async (req, res) => {
     try {
-      const { name, description } = req.body;
+      const { name, description, start_date, end_date, candidate } = req.body;
 
-      await Voting.create({
+
+      const newvoting = await Voting.create({
         vote_admin: req.user.id,
         name,
-        description
+        description,
+        start_date,
+        end_date,
+        join_code: randomStr(6, 'alphanumeric').toUpperCase()
       });
+
+
+      const candidates = [...candidate].map(
+        value => {
+          return {
+            name: value.name, voting_id: newvoting.voting_id
+          }
+        }
+      );
+
+      await Candidate.bulkCreate([...candidates]);
 
       return res.status(201).json({
         message: "New Voting Created"
       })
-    } catch (error) {
+    }
+    catch (error) {
       return res.status(500).json({
         message: error
       });
@@ -82,24 +99,46 @@ const voteControl = {
       });
     } catch (error) {
       return res.status(500).json({
-        message: error
+        message: error.message
       })
     }
   },
-  getVoteById: async (req, res) => {
+  getVoteByCode: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { code } = req.params;
+      let voted = false;
       const data = await Voting.findOne({
         where: {
-          voting_id: id
+          join_code: code
+        }
+      });
+      console.log(data);
+
+      const candidates = await Candidate.findAll({
+        where: {
+          voting_id: data.voting_id
         }
       });
 
-      return res.status(200).json({
-        data
+      const checkHistory = await History.findOne({
+        where: {
+          voting_id: data.voting_id,
+          user_id: req.user.id
+        }
       });
-    } catch (error) {
 
+      checkHistory ? voted = true : voted = false;
+
+      return res.status(200).json({
+        voting: data,
+        candidates,
+        voted
+      });
+    }
+    catch (error) {
+      return res.status(500).json({
+        message: error.message
+      })
     }
   },
   dataList: async (req, res) => {
@@ -113,7 +152,7 @@ const voteControl = {
       return res.status(200).json({
         data
       });
-    } 
+    }
     catch (error) {
       return res.status(500).json({
         message: error
@@ -143,16 +182,26 @@ const voteControl = {
   },
   candidateList: async (req, res) => {
     try {
-      const candidates = await Candidate.findAll({
+      const voting = await Voting.findOne({
         where: {
-          voting_id: req.params.id
+          join_code: req.params.id
         }
       });
 
-      return res.status(200).json({
-        candidates
+      const candidates = await Candidate.findAll({
+        where: {
+          voting_id: voting.voting_id,
+        },
+        order: Sequelize.literal("votes DESC")
       });
-    } 
+
+      const winner = candidates[0];
+
+      return res.status(200).json({
+        candidates,
+        winner
+      });
+    }
     catch (error) {
       return res.status(500).json({
         message: error.message
@@ -169,37 +218,7 @@ const voteControl = {
           }
         }
       );
-    } 
-    catch (error) {
-      return res.status(500).json({
-        message: error.message
-      })
     }
-  },
-  getWinner: async (req, res) => {
-    try {
-      const voting = await Voting.findOne(
-        {
-          where: {
-            voting_id: req.params.id
-          }
-        }
-      );
-      if (voting.active) {
-        return res.status(404).json({
-          message: "The voting isn't over yet"
-        })
-      }
-      const winner = await Candidate.max("votes", {
-        where: {
-          voting_id: req.params.id
-        }
-      });
-
-      return res.status(200).json({
-        winner
-      })
-    } 
     catch (error) {
       return res.status(500).json({
         message: error.message
@@ -208,7 +227,27 @@ const voteControl = {
   },
   deleteVote: async (req, res) => {
     try {
+      const voting = await Voting.findOne({
+        where: {
+          voting_id: req.params.id,
+          vote_admin: req.user.id
+        }
+      });
+
+      if (!voting.vote_admin) {
+        return res.status(404).json({
+          message: "Data not found"
+        })
+      }
+
       await Voting.destroy({
+        where: {
+          voting_id: req.params.id,
+          vote_admin: req.user.id
+        }
+      });
+
+      await Candidate.destroy({
         where: {
           voting_id: req.params.id
         }
@@ -217,11 +256,11 @@ const voteControl = {
       return res.status(200).json({
         message: "Deleted successfully"
       })
-    } 
+    }
     catch (error) {
       return res.status(500).json({
         message: error.message
-      })  
+      })
     }
   }
 };

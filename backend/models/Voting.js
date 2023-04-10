@@ -16,17 +16,21 @@ const Voting = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
     join_code: {
       type: DataTypes.STRING,
-      defaultValue: randomStr(6, 'alphanumeric').toUpperCase()
+      allowNull: false
     },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    end_date: {
+      type: DataTypes.DATE,
+      allowNull: false
     }
   });
 }

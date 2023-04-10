@@ -4,6 +4,7 @@ import CountDownRenderer from "./CountDownRenderer";
 
 interface Props {
     className?: string;
+    date?: Date;
 }
 
 export default function CountDown(props: Props) {
@@ -25,8 +26,8 @@ export default function CountDown(props: Props) {
     };
     return (
         <div className={`text-center ${props.className}`}>
-            <p>Voting akan dimulai pada:</p>
-            <Countdown date={Date.now() + 100000000} renderer={CountDown} />
+            <p>Voting akan berakhir pada :</p>
+            <Countdown date={new Date(props.date)} renderer={CountDown} />
         </div>
     );
 }
