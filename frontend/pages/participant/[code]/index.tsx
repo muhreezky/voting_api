@@ -49,7 +49,7 @@ export default function DetailParticipant() {
 	}, [code, loginData]);
 
 	useEffect(() => {
-		if (Date.now() >= expireDate.getTime()) {
+		if (Date.now() > expireDate.getTime()) {
 			Swal.fire({
 				title: "Error",
 				text: "Masa berlaku voting sudah habis",
