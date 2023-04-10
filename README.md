@@ -4,7 +4,7 @@ Node.js-based voting application with touch of Next.js for the frontend, and Exp
 Inspired by [@fahreziadh](https://github.com/fahreziadh) Jujurly Voting App.
 
 Created by a small team for exercise purpose
-- Muhammad Rizkiansyah
-- Vani Anggi
-- Aisah
+- Muhammad Rizkiansyah (me)
+- Vani Anggi [@vanianggi](https://github.com/vanianggi)
+- Aisah [@Aisah5](https://github.com/Aisah5)
 - Haeru
