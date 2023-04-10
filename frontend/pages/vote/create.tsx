@@ -32,8 +32,8 @@ export default function CreateVote() {
       axios.post("http://localhost:8000/votings", {
         name,
         candidate,
-        start_date: start_date.replace(".000Z", ".782Z"),
-        end_date: end_date.replace(".000Z", ".782Z")
+        start_date,
+        end_date
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.loginToken}`
@@ -141,8 +141,8 @@ export default function CreateVote() {
                         locale={"id"}
                         showTimeSelect
                         selected={endDate}
-                        name="start_date"
-                        id="start_date"
+                        name="end_date"
+                        id="end_date"
                         onChange={(date) => date && setEndDate(date)}
                         dateFormat={"Pp"}
                         minDate={startDate}

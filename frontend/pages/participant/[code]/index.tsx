@@ -21,6 +21,7 @@ export default function DetailParticipant() {
 	const [code, setCode] = useState<string | string[]>("");
 	const [votingData, setVotingData] = useState<dataProps>({});
 	const [loginData, setLoginData] = useLocalStorage("loginToken");
+	const [startDate, setStartDate] = useState<Date>(new Date());
 	const [expireDate, setExpireDate] = useState<Date>(new Date());
 
 	useEffect(() => {
